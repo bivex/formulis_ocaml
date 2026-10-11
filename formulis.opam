@@ -1,0 +1,20 @@
+opam-version: "2.0"
+synopsis: "Reactive programming with formulae"
+description: """
+A radically simple reactive programming library: a term stores a value
+that can change over time, a formula combines terms (and other
+formulae) with operations and always evaluates to the most up-to-date
+value of each term it uses.
+"""
+maintainer: ["rxdt-labs"]
+authors: ["rxdt-labs"]
+license: "Apache-2.0"
+homepage: "https://github.com/rxdt-labs/formulis"
+bug-reports: "https://github.com/rxdt-labs/formulis/issues"
+depends: [
+  "ocaml"
+  "dune" {>= "3.0"}
+]
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]
