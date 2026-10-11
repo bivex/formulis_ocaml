@@ -1,84 +1,73 @@
-<p align="center">
-  <img src="formulis_logo.svg" alt="formulis">
-</p>
+# formulis
 
-## What is it?
+![logo](formulis_logo.svg)
 
-`formulis` is a radically simple reactive programming library that allows you to make event listeners using formulae. What does that mean? First, consider this small example:
+[![CI](https://github.com/rxdt-labs/formulis/actions/workflows/test.yml/badge.svg)](https://github.com/rxdt-labs/formulis/actions/workflows/test.yml)
+[![docs](https://github.com/rxdt-labs/formulis/actions/workflows/pages.yml/badge.svg)](https://github.com/rxdt-labs/formulis/actions/workflows/pages.yml)
+[![license](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-```cpp
-#include "formulis/formulis.hpp"
+A radically simple reactive programming library.
 
-auto main() -> int
-{
-  term x(3); // A term that holds an int value.
-  term y(5); // Same as above.
-  auto z = x + y; // z = x + y -> 3 + 5 = 8.
-  x.set(4); // Change the value of the term x.
-  // z = x + y -> 4 + 5 = 9 now. Everything is updated automatically.[
-}
+A **term** stores a value that can change over time. A **formula** combines terms (and other formulae) with operations and always evaluates to the most up-to-date value of each term it uses:
+
+```ocaml
+let x = Formulis.term 3
+and y = Formulis.term 5 in
+let z = Formulis.Int.(Term x +~ Term y) in        (* z = 8 *)
+Formulis.on_change z (fun old new_ ->
+    Printf.printf "z changed from %d to %d\n" old new_);
+Formulis.set x 4;
+Formulis.eval z                                  (* 9 — updated automatically *)
 ```
 
-Formulae update to reflect changes in their terms. Furthermore, we can listen for changes:
+The equivalent compiled example lives in
+[examples/demo.ml](examples/demo.ml); run it with `dune exec examples/demo.exe`:
 
-```cpp
-#include <iostream>
-#include "formulis/formulis.hpp"
-
-auto listen_to_z(int old_val, int new_val) -> void
-{
-  std::cout << "z changed from " << old_val << " to " << new_val << endl;
-}
-
-auto main() -> int
-{
-  term x(3);
-  term y(5);
-  auto z = x + y; // z = x + y -> 3 + 5 = 8.
-  z.on_change(listen_to_z); 
-  x.set(4); // Change the value of the term x.
-  // Prints "z changed from 8 to 9".
-}
+```
+8
+z changed from 8 to 9
+9
 ```
 
-This provides powerful ways of organizing the execution flow of programs.
+## Features
 
-## Using the Library
-
-This is a header-only library with one file, namely `include/formulis/formulis.hpp`.
-
-## Testing from Source
-
-The library was created using modified [cmake-init](https://github.com/friendlyanon/cmake-init) scaffolding for [conan](https://conan.io/) projects. First, ensure that [`cmake`](https://cmake.org/) and [`conan`](https://conan.io/) are installed. Next, ensure a "Conan Profile" is established for your computer with:
-
-```bash
-conan profile detect --name defualt
-```
-
-This needs to be only ran once. Then run:
-
-```bash
-conan install . -S build_type=Debug -b missing
-```
-
-This will have `conan` install the third party dependencies ([Catch2](https://github.com/catchorg/Catch2) for testing). Set up the "presets" once:
-
-```bash
-cmake --preset=dev
-```
-
-Finally, to build:
-
-```bash
-cmake --build --preset=dev
-```
-
-and to test:
-
-```bash
-ctest --preset=dev
-```
+- **Radically simple.** Terms, formulae and change listeners — that is
+  the whole API.
+- **Automatic updates.** Setting a term refreshes every formula that
+  (transitively) uses it, and fires the listeners of every value that
+  actually changed.
+- **Typed operators.** OCaml has no overloading of `+` across types, so
+  the operators live in small modules: [`Formulis.Int`](src/formulis.mli),
+  `Formulis.Float` and `Formulis.Bool`.
+- **Custom operators.** Any function becomes a reactive operator with
+  `Formulis.map` and `Formulis.map2`.
+- **No manual memory work.** The garbage collector owns the dependency
+  graph: there is nothing to disconnect and nothing to leak.
 
 ## Documentation
 
-Documentation can be found [here.](https://rxdt-labs.github.io/formulis/)
+- [Using formulis](docs/pages/using.md) — the public API from a user's
+  point of view.
+- [How it works](docs/pages/internals.md) — the update algorithm and the
+  data structures behind it.
+- [The test suite](docs/pages/tests.md) — what is covered and how to run
+  it.
+- API reference — `dune build @doc` with
+  [odoc](https://ocaml.github.io/odoc/) installed.
+
+## Building and testing
+
+See [BUILDING.md](BUILDING.md). The short version:
+
+```
+opam install ocaml dune
+dune build @runtest
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [HACKING.md](HACKING.md).
+
+## License
+
+[Apache License 2.0](LICENSE)

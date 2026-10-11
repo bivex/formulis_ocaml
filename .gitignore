@@ -1,13 +1,4 @@
-**/.DS_Store
-.idea/
-.vs/
-.vscode/
-build/
-cmake-build-*/
-conan/
-prefix/
-.clangd
-CMakeLists.txt.user
-compile_commands.json
-conan_cache_*.tgz
-docs/html
+_build/
+_opam/
+.merlin
+*.install
